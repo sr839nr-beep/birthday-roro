@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Happy Birthday My Roro</title>
+
+<style>
+html, body{
+margin:0;
+padding:0;
+height:100%;
+overflow:hidden;
+background:#0b0010;
+font-family: monospace;
+}
+
+/* كانفس الخلفية */
+canvas{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:0;
+}
+
+/* النص فوق */
+#message{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+z-index:2;
+text-align:center;
+font-size:clamp(28px,5vw,80px);
+color:#ffd1f0;
+text-shadow:
+0 0 15px #ff4fd8,
+0 0 35px #b300ff;
+opacity:0;
+transition:1s;
+}
+
+.show{
+opacity:1 !important;
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+
+<div id="message">
+💖 Happy Birthday 💖<br>
+My Roro 🎂✨
+</div>
+
+<script>
+
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
+
+function resize(){
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
+
+/* حروف وأرقام */
+const chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&@*+";
+
+const fontSize = 18;
+let columns = canvas.width / fontSize;
+
+/* كل عمود له سقوط */
+let drops = Array.from({length: columns}, () => Math.random() * canvas.height);
+
+function draw(){
+
+// خلفية شفافة عشان الذيل يختفي تدريجي
+ctx.fillStyle = "rgba(10,0,20,0.08)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+for(let i=0;i<drops.length;i++){
+
+let text = chars[Math.floor(Math.random()*chars.length)];
+
+// درجات الوردي والبنفسجي
+let hue = 300 + Math.random()*60; // 300-360 = pink/purple
+ctx.fillStyle = `hsl(${hue}, 100%, 65%)`;
+
+ctx.font = fontSize + "px monospace";
+
+let x = i * fontSize;
+let y = drops[i];
+
+ctx.fillText(text, x, y);
+
+// نزول
+drops[i] += fontSize * 0.9;
+
+// لما يطلع تحت يرجع فوق
+if(drops[i] > canvas.height){
+drops[i] = 0;
+}
+
+}
+
+requestAnimationFrame(draw);
+}
+
+draw();
+
+/* ظهور الرسالة بعد ثانيتين */
+setTimeout(()=>{
+document.getElementById("message").classList.add("show");
+}, 2000);
+
+</script>
+
+</body>
+</html>
