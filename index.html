@@ -1,22 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Happy Birthday My Roro</title>
+<title>Happy Birthday manar</title>
 
 <style>
-html, body{
+
+html,body{
 margin:0;
 padding:0;
 height:100%;
 overflow:hidden;
 background:#0b0010;
-font-family: monospace;
+font-family:monospace;
 }
 
-/* كانفس الخلفية */
 canvas{
 position:fixed;
 top:0;
@@ -26,25 +25,62 @@ height:100%;
 z-index:0;
 }
 
-/* النص فوق */
-#message{
+#count{
 position:absolute;
 top:50%;
 left:50%;
 transform:translate(-50%,-50%);
-z-index:2;
-text-align:center;
-font-size:clamp(28px,5vw,80px);
-color:#ffd1f0;
+font-size:20vw;
+font-weight:bold;
+color:#ff69d9;
 text-shadow:
-0 0 15px #ff4fd8,
-0 0 35px #b300ff;
+0 0 20px #ff2fa8,
+0 0 50px #b300ff;
+opacity:0;
+z-index:3;
+transition:.3s;
+}
+
+#message{
+position:absolute;
+top:60%;
+left:50%;
+transform:translate(-50%,-50%);
+font-size:clamp(28px,6vw,80px);
+text-align:center;
+color:#ffd8f4;
+text-shadow:
+0 0 20px #ff4fd8,
+0 0 50px #b300ff;
 opacity:0;
 transition:1s;
+z-index:3;
+}
+
+#cat{
+position:absolute;
+top:30%;
+left:-20%;
+font-size:12vw;
+opacity:0;
+z-index:3;
 }
 
 .show{
 opacity:1 !important;
+}
+
+.dance{
+animation:dance .45s infinite alternate;
+}
+
+@keyframes dance{
+from{
+transform:rotate(-15deg) scale(1);
+}
+to{
+transform:rotate(15deg) scale(1.1);
+}
 }
 
 </style>
@@ -54,12 +90,18 @@ opacity:1 !important;
 
 <canvas id="bg"></canvas>
 
+<div id="count"></div>
+
+<div id="cat">🐱</div>
+
 <div id="message">
-💖 Happy Birthday 💖<br>
-My Roro 🎂✨
+Happy Birthday<br>
+Manar 🎂❤️
 </div>
 
 <script>
+
+/* ===== MATRIX BACKGROUND ===== */
 
 const canvas = document.getElementById("bg");
 const ctx = canvas.getContext("2d");
@@ -67,61 +109,113 @@ const ctx = canvas.getContext("2d");
 function resize(){
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-}
-resize();
-window.addEventListener("resize", resize);
 
-/* حروف وأرقام */
-const chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&@*+";
+columns = Math.floor(canvas.width / fontSize);
+drops = Array(columns).fill(1);
+}
+
+const chars =
+"01ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%&*<>[]{}";
 
 const fontSize = 18;
-let columns = canvas.width / fontSize;
 
-/* كل عمود له سقوط */
-let drops = Array.from({length: columns}, () => Math.random() * canvas.height);
+let columns;
+let drops;
 
-function draw(){
+resize();
 
-// خلفية شفافة عشان الذيل يختفي تدريجي
+window.addEventListener("resize", resize);
+
+function drawMatrix(){
+
 ctx.fillStyle = "rgba(10,0,20,0.08)";
 ctx.fillRect(0,0,canvas.width,canvas.height);
 
 for(let i=0;i<drops.length;i++){
 
-let text = chars[Math.floor(Math.random()*chars.length)];
+const text =
+chars[Math.floor(Math.random()*chars.length)];
 
-// درجات الوردي والبنفسجي
-let hue = 300 + Math.random()*60; // 300-360 = pink/purple
-ctx.fillStyle = `hsl(${hue}, 100%, 65%)`;
+const hue = 285 + Math.random()*45;
+
+ctx.fillStyle =
+`hsl(${hue},100%,65%)`;
 
 ctx.font = fontSize + "px monospace";
 
-let x = i * fontSize;
-let y = drops[i];
+ctx.fillText(
+text,
+i * fontSize,
+drops[i] * fontSize
+);
 
-ctx.fillText(text, x, y);
-
-// نزول
-drops[i] += fontSize * 0.9;
-
-// لما يطلع تحت يرجع فوق
-if(drops[i] > canvas.height){
+if(
+drops[i] * fontSize > canvas.height &&
+Math.random() > 0.975
+){
 drops[i] = 0;
 }
 
+drops[i]++;
 }
 
-requestAnimationFrame(draw);
+requestAnimationFrame(drawMatrix);
 }
 
-draw();
+drawMatrix();
 
-/* ظهور الرسالة بعد ثانيتين */
-setTimeout(()=>{
-document.getElementById("message").classList.add("show");
-}, 2000);
+/* ===== COUNTDOWN ===== */
+
+const count = document.getElementById("count");
+const cat = document.getElementById("cat");
+const message = document.getElementById("message");
+
+function wait(ms){
+return new Promise(resolve=>setTimeout(resolve,ms));
+}
+
+async function start(){
+
+for(let n of ["3","2","1"]){
+
+count.textContent = n;
+count.classList.add("show");
+
+await wait(900);
+
+count.classList.remove("show");
+
+await wait(250);
+}
+
+/* القطة تظهر */
+cat.style.opacity="1";
+
+let pos = -20;
+
+const walk = setInterval(()=>{
+
+pos += 1.5;
+
+cat.style.left = pos + "%";
+
+if(pos >= 42){
+
+clearInterval(walk);
+
+message.classList.add("show");
+
+cat.classList.add("dance");
+
+}
+
+},20);
+
+}
+
+start();
 
 </script>
 
 </body>
-</html>
+</html>, 
